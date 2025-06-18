@@ -1,0 +1,53 @@
+# =====================
+# Python (backend)
+# =====================
+
+# Virtual environment
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+
+# Environment variables
+backend/.env
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*$py.class
+
+# =====================
+# Node.js (frontend)
+# =====================
+
+# dependencies
+frontend/node_modules/
+
+# production
+frontend/build/
+
+# misc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+frontend/.env
+
+# =====================
+# IDE / Editor
+# =====================
+
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# =====================
+# OS Files
+# =====================
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
