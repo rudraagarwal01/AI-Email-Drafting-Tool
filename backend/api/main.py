@@ -4,12 +4,13 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import openai
 import os
-print("OpenAI API Key:", os.getenv("OPENAI_API_KEY"))
 
 load_dotenv()
 app = FastAPI()
 
-# CORS middleware
+
+
+# CORS middleware setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class EmailRequest(BaseModel):
     prompt: str
@@ -28,17 +30,14 @@ async def generate_email(request: EmailRequest):
         raise HTTPException(status_code=500, detail="OpenAI API key not configured")
 
     try:
-        # Use new ChatCompletion API format
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that drafts professional emails."},
-                {"role": "user", "content": request.prompt},
-            ],
-            max_tokens=200,
-            temperature=0.7,
-        )
-        email_text = response.choices[0].message.content.strip()
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": request.prompt}],
+    max_tokens=200,
+    temperature=0.7,
+)
+
+        email_text = response.choices[0].text.strip()
         return {"email": email_text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
