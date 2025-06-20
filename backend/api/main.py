@@ -5,22 +5,22 @@ from dotenv import load_dotenv
 import openai
 import os
 
+# Load environment variables from .env
 load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
 app = FastAPI()
 
-
-
-# CORS middleware setup
+# Enable CORS for frontend to talk to backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Adjust for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
+# Define request schema
 class EmailRequest(BaseModel):
     prompt: str
 
@@ -30,14 +30,16 @@ async def generate_email(request: EmailRequest):
         raise HTTPException(status_code=500, detail="OpenAI API key not configured")
 
     try:
-        response = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
-    messages=[{"role": "user", "content": request.prompt}],
-    max_tokens=200,
-    temperature=0.7,
-)
-
-        email_text = response.choices[0].text.strip()
-        return {"email": email_text}
+        # Use updated OpenAI API (v1+)
+        response = openai.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an assistant that drafts professional emails."},
+                {"role": "user", "content": request.prompt}
+            ],
+            max_tokens=200,
+            temperature=0.7,
+        )
+        return {"email": response.choices[0].message.content.strip()}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
